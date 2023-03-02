@@ -1,1 +1,3 @@
-/mongo_pass.py
+mongo_pass.py
+.idea/
+__pycache__/
