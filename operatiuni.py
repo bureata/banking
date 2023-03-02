@@ -96,7 +96,7 @@ def sterge_client(nume_client, clients_collection):
     #     print(f'Soldul este 0. Contul va fi sters, impreuna cu informatiile despre client.')
 
 
-def constructor_client(nume_client, clients_collecmodifica_soldtion):
+def constructor_client(nume_client, clients_collection):
     date_client = clients_collection.find_one({"nume": nume_client},
                                               {"_id": 0, "nume": 1, "balanta": 1, "tranzactii": 1})
     client = Client(date_client["nume"], balanta=date_client["balanta"])
