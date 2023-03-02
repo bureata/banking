@@ -96,7 +96,7 @@ def sterge_client(nume_client, clients_collection):
     #     print(f'Soldul este 0. Contul va fi sters, impreuna cu informatiile despre client.')
 
 
-def constructor_client(nume_client, clients_collection):
+def constructor_client(nume_client, clients_collecmodifica_soldtion):
     date_client = clients_collection.find_one({"nume": nume_client},
                                               {"_id": 0, "nume": 1, "balanta": 1, "tranzactii": 1})
     client = Client(date_client["nume"], balanta=date_client["balanta"])
@@ -115,14 +115,14 @@ def modifica_sold(client, valoare, clients_collection):
     :param valoare: float Valoare cu care soldul va fi modificat. Poate fi pozitiva sau negativa.
     :return sold: float Soldul dupa ce a fost facuta mofidicarea
     """
+
     if valoare < 0:
-        if abs(valoare) < dict_clients[nume_client]['sold']:
-            client.retragere(valoare)
-        else:
-            print('Sold insuficient pentru tranzactia dorita.')
+        client.retragere(valoare)
+    elif valoare > 0:
+        client.depunere(valoare)
     else:
-        if valoare > 0:
-            client.depunere(valoare)
+        raise Exception("valoare invalida")
+
     tranzactii_list = []
     for item in client.tranzactii:
         tranzactii_list.append(item.__dict__)
