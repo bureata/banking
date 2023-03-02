@@ -42,6 +42,7 @@ def verifica_sold(nume_client):
         print('Client inexistent.')
         return {"error_message": "clientul nu a fost gasit in baza de date"}, 404
 
+
 @app.route("/api/client/filtru/<filtru>", methods=["GET"])
 def afiseaza_clientii(filtru):
     """
@@ -68,3 +69,4 @@ def afiseaza_clientii(filtru):
         return {"error_message": "niciun client pentru filtrul introdus"}, 404
 
 app.run(debug=True)
+
