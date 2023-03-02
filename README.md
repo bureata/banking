@@ -1,2 +1,2 @@
 # banking
-mongo_pass.py file (that is ingored) should have a connection link to mongodb
+"mongo_pass.py" file (marked in the .gitignore file as ingored) should contain the connection link to mongodb, stored as a variable named "pass_text"
