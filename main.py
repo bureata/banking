@@ -3,9 +3,6 @@ from flask import Flask, jsonify, request
 from flasgger import Swagger
 import pymongo
 from operatiuni import *
-from input_utils import introdu_nume, introdu_numar
-# from IPython.display import clear_output
-from admin_date import *
 from mongo_pass import *
 
 app = Flask(__name__)
