@@ -1,3 +1,4 @@
+# TODO implement two languages for the front end part
 
 from flask import Flask, jsonify, request
 from flasgger import Swagger
@@ -59,7 +60,7 @@ def search_clients(name_filter):
     """
 
     try:
-        clients_data = afiseaza_clienti(name_filter, clients_collection)
+        clients_data = retrieve_clients(name_filter, clients_collection)
     except NoClientsForFilter as e:
         print(f'Exception: {e}')
         return {"error_message": str(e)}, 404
