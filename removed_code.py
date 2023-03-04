@@ -58,4 +58,37 @@ Sucursala Bucuresti
 """
           )
 
+def formatere_data_extras_cont(string_date_time, dt_in_format="%Y%m%d%H%M%S", dt_out_format="%d %B %Y"):
+    """
+    Functie care primeste o data intr-un anumit format si o returneaza intr-un alt format la alegere (de exemplu este primita in formatul cu care este introdusa in fisierul de tranzactii si o returneaza in formatul cu care va fi afisata in extrasul de cont, pentru o citire mai usoara. Functia poate primi cele 2 formate, sau le va folosi pe cele default (cele din exemplu) in caz contrar.
+    :param string_date_time: str Data in formatul din fisierul cu tranzactii
+    :param dt_in_format: str Formatul in care se primeste data
+    :param dt_out_format: str Formatul in care se returneaza data
+    :return data: str Data in formatul dorit
+    """
+    back_to_dt = datetime.datetime.strptime(string_date_time, dt_in_format)
+    str_out_date = datetime.datetime.strftime(back_to_dt, dt_out_format)
+    return str_out_date
 
+
+def formatare_data_cautare(data_format_input, in_format="%d.%m.%Y", out_format="%Y%m%d%H%M%S"):
+    dt_obj = datetime.datetime.strptime(data_format_input, in_format)
+    return datetime.datetime.strftime(dt_obj, out_format)
+
+
+def formatere_data_antet(data, in_format="%Y%m%d%H%M%S", out_format="%d.%m.%Y"):
+    dt_obj = datetime.datetime.strptime(data, in_format)
+    return datetime.datetime.strftime(dt_obj, out_format)
+
+def tranzactii_in_perioada(nume_client, clients_collection):
+    data_inceput = date_validator('Introdu data de inceput in formatul "zz.ll.aaaa" (enter pentru inceput): ')
+    data_sfarsit = date_validator('Introdu data de sfarsit in formatul "zz.ll.aaaa" ("prezent" pentru data curenta): ')
+    date_client = clients_collection.find_one({"nume": nume_client}, {"_id": 0, "tranzactii": 1})
+    lista_tranzactii = []
+
+    for item in date_client["tranzactii"]:
+        if int(data_inceput) <= int(item["timestamp"]) <= int(data_sfarsit):
+            lista_tranzactii.append(item)
+
+    perioada = (formatere_data_antet(data_inceput), formatere_data_antet(data_sfarsit))
+    return lista_tranzactii, perioada

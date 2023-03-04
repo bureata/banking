@@ -1,4 +1,4 @@
-from input_utils import *
+from data_validators import *
 from exceptions import *
 
 
@@ -56,6 +56,13 @@ class Transaction:
         return self.sender + "|" + str(self.amount) + "|" + self.receiver + "|" + self.transaction_type
 
 
+def transaction_timestamp():
+    dt = datetime.datetime.now()
+    dt_format = "%Y%m%d%H%M%S"
+    str_dt = dt.strftime(dt_format)
+    return int(str_dt)
+
+
 def create_client(clients_collection):  # TODO modify the function so clients can be created from the api too
     """
     Creating a client object in memory and putting it in the database too.
@@ -63,7 +70,7 @@ def create_client(clients_collection):  # TODO modify the function so clients ca
     """
     # clients_collection = db["clients"]
     cnp = input('Intordu CNP: ')
-    name = introdu_nume('Numele noului client: ')
+    name = name_validator('Numele noului client: ')
     phone = input('Numar de telefon: ')
     address = input('Adresa: ')
 
