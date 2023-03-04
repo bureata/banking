@@ -1,5 +1,6 @@
 from input_utils import *
 from elemente_extras import *
+from exceptions import *
 
 
 class Client:
@@ -166,21 +167,15 @@ def transfer(valoare, nume_expeditor, nume_destinatar, clients_collection):
             print('Expeditorul nu are fonduri suficiente. Transferul nu a fost efectuat.')
 
 
-def afiseaza_clienti(filtru, clients_collection):
-    print("""--------------------------------------------------------
-    Lista clientilor:
-            """)
-    clients_names = clients_collection.find({'nume': {'$regex': filtru, '$options': 'i'}},
+def afiseaza_clienti(filter, clients_collection):
+    clients_names = clients_collection.find({'nume': {'$regex': filter, '$options': 'i'}},
                                             {"_id": 0, "nume": 1, "cnp": 1})
     clients_list = []
     for name in clients_names:
-        # if filtru.lower() in name["nume"].lower():
-        print(f'{name["nume"]} | {name["cnp"]}')
         clients_list.append({name["nume"]: name["cnp"]})
 
-    print('--------------------------------------------------------')
     if len(clients_list) == 0:
-        raise Exception()
+        raise NoClientsForFilter(f'No clients for <{filter}> filter.')
     return clients_list
 
 

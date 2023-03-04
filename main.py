@@ -60,11 +60,16 @@ def afiseaza_clientii(filtru):
             description: User not found
     """
 
+    # clients_names = afiseaza_clienti(filtru, clients_collection)
+    # return jsonify(clients_names)
+
     try:
         clients_names = afiseaza_clienti(filtru, clients_collection)
+    except NoClientsForFilter as e:
+        print(f'Exception: {e}')
+        return {"error_message": str(e)}, 404
+    else:
         return jsonify(clients_names)
-    except:
-        return {"error_message": "niciun client pentru filtrul introdus"}, 404
 
 
 @app.route("/api/client/<nume_client>/<valoare>", methods=["PUT"])
@@ -98,9 +103,11 @@ def modificare_sold(nume_client, valoare):
         print('Client inexistent.')
         return {"error_message": "clientul nu a fost gasit in baza de date"}, 404
     except ValueError as e:
+        print(str(e))
         return {"error_message": "valoarea trebuie sa fie un numar real"}, 400
     except Exception as e:
-        return {"error_message": str(e)}, 400
+        return {"error_message": str(e)}, 4004
+
 
 @app.route("/api/client", methods=["POST"])
 def inregistreaza_client():
@@ -121,11 +128,6 @@ def inregistreaza_client():
     client_data = request.get_json()
     print(client_data)
     return {}, 200
-    # try:
-    #     clients_names = afiseaza_clienti(filtru, clients_collection)
-    #     return jsonify(clients_names)
-    # except:
-    #     return {"error_message": "niciun client pentru filtrul introdus"}, 404
+
 
 app.run(debug=True)
-
