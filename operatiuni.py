@@ -160,7 +160,7 @@ def transfer(amount, sender_name, receiver_name, clients_collection):  # TODO
             print(f"{sender.name}'s final balance: {sender.balance}")
             print(f"{receiver.name}'s final balance: {receiver.balance}")
 
-            sender_transactions = []
+            sender_transactions = []  # TODO use function
             for item in sender.transactions:
                 sender_transactions.append(item.__dict__)
             clients_collection.update_one({"name": sender.name},
@@ -168,7 +168,7 @@ def transfer(amount, sender_name, receiver_name, clients_collection):  # TODO
 
             print(receiver.transactions)
 
-            receiver_transactions = []
+            receiver_transactions = []  # TODO use function
             for item in receiver.transactions:
                 receiver_transactions.append(item.__dict__)
             clients_collection.update_one({"name": receiver.name}, {
