@@ -3,7 +3,7 @@
 from flask import Flask, jsonify, request
 from flasgger import Swagger
 import pymongo
-from operatiuni import *
+from operations import *
 from mongo_credentials import *
 
 app = Flask(__name__)
