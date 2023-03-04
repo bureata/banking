@@ -14,26 +14,25 @@ db = db_client["bankingDB"]
 clients_collection = db["clients"]
 
 
-@app.route("/api/client/<nume_client>", methods=["GET"])
-def verifica_sold(nume_client):
+@app.route("/api/client/<client_name>", methods=["GET"])
+def check_balance(client_name):
     """
-    Returneaza balanta unui client
+    Returns the balance of a client
     ---
     parameters:
-        - name: nume_client
+        - name: client_name
           in: path
-          description: "numele clientului"
+          description: "name of the client"
           type: string
           required: true
     responses:
         200:
-            description: An user object
-            # examples: {'name': 'Ion', balance: 200}
+            description: "58"
         404:
-            description: User not found
+            description: User not found.
     """
     try:
-        balanta = clients_collection.find_one({"nume": nume_client}, {"_id": 0, "balanta": 1})["balanta"]
+        balanta = clients_collection.find_one({"nume": client_name}, {"_id": 0, "balanta": 1})["balanta"]
         print(balanta)
         return jsonify(balanta)
     except TypeError:
@@ -41,89 +40,83 @@ def verifica_sold(nume_client):
         return {"error_message": "clientul nu a fost gasit in baza de date"}, 404
 
 
-@app.route("/api/client/filtru/<filtru>", methods=["GET"])
-def afiseaza_clientii(filtru):
+@app.route("/api/client/filtru/<name_filter>", methods=["GET"])
+def search_clients(name_filter):
     """
-    Returneaza balanta unui client
+    Show the clients based on name filter (show all for no filter).
     ---
     parameters:
-        - name: filtru
+        - name: name_filter
           in: path
-          description: "filtru"
+          description: "filter for narrowing the search by name"
           type: string
           required: true
     responses:
         200:
-            description: An user object
-            # examples: {'name': 'Ion', balance: 200}
+            description: Will list a table with names and unique ID-s matching the provided filter.
         404:
-            description: User not found
+            description: User not found.
     """
 
-    # clients_names = afiseaza_clienti(filtru, clients_collection)
-    # return jsonify(clients_names)
-
     try:
-        clients_names = afiseaza_clienti(filtru, clients_collection)
+        clients_data = afiseaza_clienti(name_filter, clients_collection)
     except NoClientsForFilter as e:
         print(f'Exception: {e}')
         return {"error_message": str(e)}, 404
     else:
-        return jsonify(clients_names)
+        return jsonify(clients_data)
 
 
-@app.route("/api/client/<nume_client>/<valoare>", methods=["PUT"])
-def modificare_sold(nume_client, valoare):
+@app.route("/api/client/<client_name>/<value>", methods=["PUT"])
+def change_balance(client_name, value):
     """
-    Returneaza balanta unui client
+    Modify the balance for a specific client.
     ---
     parameters:
-        - name: nume_client
+        - name: client_name
           in: path
-          description: "numele clientului"
+          description: "client name"
           type: string
           required: true
-        - name: valoare
+        - name: value
           in: path
-          description: "valoarea cu care se modifica balanta"
+          description: "value of the modification"
           type: string
           required: true
     responses:
         200:
-            description: An user object
-            # examples: {'name': 'Ion', balance: 200}
+            description: An user object.
         404:
-            description: User not found
+            description: User not found.
     """
 
     try:
-        modifica_sold(constructor_client(nume_client, clients_collection), float(valoare), clients_collection)
-        return {"message": "Balanta modificata cu succes."}, 200
+        balance_change(client_obj_constructor(client_name, clients_collection), float(value), clients_collection)
+        return {"message": "Balance was successfully modified."}, 200
     except TypeError:
-        print('Client inexistent.')
-        return {"error_message": "clientul nu a fost gasit in baza de date"}, 404
+        print('Client does not exist.')
+        return {"error_message": "Client not found in the database."}, 404
     except ValueError as e:
         print(str(e))
-        return {"error_message": "valoarea trebuie sa fie un numar real"}, 400
+        return {"error_message": "Value must be a number."}, 400
     except Exception as e:
-        return {"error_message": str(e)}, 4004
+        return {"error_message": str(e)}, 404
 
 
 @app.route("/api/client", methods=["POST"])
-def inregistreaza_client():
+def register_client():
     """
-    Returneaza balanta unui client
+    Register a new client into the database.
     ---
     parameters:
-        - name: date_client
+        - name: client_data
           in: body
 
     responses:
         200:
-            description: An user object
-            # examples: {'name': 'Ion', balance: 200}
-        404:
-            description: User not found
+            description: An user object.
+        400:
+            description: Dataset not valid.
     """
     client_data = request.get_json()
     print(client_data)

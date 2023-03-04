@@ -95,7 +95,7 @@ def sterge_client(nume_client, clients_collection):
     #     print(f'Soldul este 0. Contul va fi sters, impreuna cu informatiile despre client.')
 
 
-def constructor_client(nume_client, clients_collection):
+def client_obj_constructor(nume_client, clients_collection):
     date_client = clients_collection.find_one({"nume": nume_client},
                                               {"_id": 0, "nume": 1, "balanta": 1, "tranzactii": 1})
     client = Client(date_client["nume"], balanta=date_client["balanta"])
@@ -107,7 +107,7 @@ def constructor_client(nume_client, clients_collection):
     return client
 
 
-def modifica_sold(client, valoare, clients_collection):
+def balance_change(client, valoare, clients_collection):
     """
     Functie care modifica soldul unui cont
     :param nume_client: text Numele clientului al carui sold trebuie modificat
@@ -141,8 +141,8 @@ def transfer(valoare, nume_expeditor, nume_destinatar, clients_collection):
     if valoare <= 0:
         print('Valoarea transferata trebuie sa fie pozitiva. Transferul nu a fost efectuat.')
     else:
-        expeditor = constructor_client(nume_expeditor, clients_collection)
-        destinatar = constructor_client(nume_destinatar, clients_collection)
+        expeditor = client_obj_constructor(nume_expeditor, clients_collection)
+        destinatar = client_obj_constructor(nume_destinatar, clients_collection)
         if expeditor.balanta >= valoare:
             print(f"Soldul initial al clientului {expeditor.nume}: {expeditor.balanta}")
             print(f"Soldul initial al clientului {destinatar.nume}: {destinatar.balanta}")
