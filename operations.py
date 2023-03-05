@@ -13,13 +13,12 @@ class Client:
         self.transactions = []
         self.deleted = deleted
 
-    def withdrawal(self, amount):  # TODO raise exception if not enough funds
+    def withdrawal(self, amount):
 
-        if self.balance < amount:
-            print("not enough funds")
-            return
+        if self.balance < -amount:
+            raise NotEnoughFunds
 
-        self.balance = self.balance - amount
+        self.balance += amount
         self.transactions.append(Transaction("withdrawal", self.name, amount))
 
     def deposit(self, amount):
@@ -115,9 +114,9 @@ def client_obj_constructor(client_name, clients_collection):  # TODO take the cl
         for transaction in client_data["transactions"]:
             client.transactions.append(
                 Transaction(transaction["transaction_type"],
-                            transaction["expeditor"],
-                            transaction["suma"],
-                            transaction["destinatar"],
+                            transaction["sender"],
+                            transaction["amount"],
+                            transaction["receiver"],
                             transaction["timestamp"]))
     return client
 
@@ -131,7 +130,6 @@ def balance_change(client, amount, clients_collection):  # TODO
     :param client: Client Object of the client.
     :param amount: float The amount for the modification.
     """
-
     if amount < 0:
         client.withdrawal(amount)
     elif amount > 0:

@@ -97,11 +97,15 @@ def change_balance(client_name, value):
     except TypeError:
         print('Client does not exist.')
         return {"error_message": "Client not found in the database."}, 404
-    except ValueError as e:
-        print(str(e))
+    except NotEnoughFunds as excep:
+        print(type(excep).__name__)
+        return {"error_message": "Not enough funds."}, 400
+    except ValueError as excep:
+        print(str(excep))
         return {"error_message": "Value must be a number."}, 400
-    except Exception as e:
-        return {"error_message": str(e)}, 404
+    except Exception as excep:
+        print(excep)
+        return {"error_message": type(excep).__name__}, 404
 
 
 @app.route("/api/client", methods=["POST"])

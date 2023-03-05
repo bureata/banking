@@ -8,3 +8,7 @@ class UserDataMissingArgument(KeyError):
 
 class UserDataWrongType(ValueError):
     pass
+
+
+class NotEnoughFunds(ValueError):
+    pass
