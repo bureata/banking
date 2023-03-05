@@ -4,7 +4,7 @@ from exceptions import *
 
 class Client:
 
-    def __init__(self, name, cnp=None, phone=None, address=None, balance=0, deleted=False):
+    def __init__(self, name, cnp, phone, address, balance=0.0, deleted=False):
         self.name = name
         self.cnp = cnp
         self.phone = phone
@@ -63,18 +63,17 @@ def transaction_timestamp():
     return int(str_dt)
 
 
-def create_client(clients_collection):  # TODO modify the function so clients can be created from the api too
+def create_client(client_data: dict, clients_collection):
     """
-    Creating a client object in memory and putting it in the database too.
+    Instantiates a client object and register client data into the database.
+    :param client_data: dict A dictionary with all data necessary to instantiate a Client object.
     :param clients_collection: mongoDB_object Connection object to a specific collection on a mongoDB database.
     """
-    # clients_collection = db["clients"]
-    cnp = input('Intordu CNP: ')
-    name = name_validator('Numele noului client: ')
-    phone = input('Numar de telefon: ')
-    address = input('Adresa: ')
 
-    new_client = Client(name, cnp, phone, address)
+    for value in client_data.values():
+        if type(value) != str:
+            raise UserDataWrongType('Data supplied as client data is of wrong type.')
+    new_client = Client(client_data["name"], client_data["cnp"], client_data["phone"], client_data["address"])
     clients_collection.insert_one(new_client.__dict__)
     return new_client
 
@@ -100,8 +99,18 @@ def delete_client_data():
 
 def client_obj_constructor(client_name, clients_collection):  # TODO take the client_id parameter instead of client_name
     client_data = clients_collection.find_one({"name": client_name},
-                                              {"_id": 0, "name": 1, "balance": 1, "transactions": 1})
-    client = Client(client_data["name"], balance=client_data["balance"])
+                                              {"_id": 0,
+                                               "name": 1,
+                                               "cnp": 1,
+                                               "phone": 1,
+                                               "address": 1,
+                                               "balance": 1,
+                                               "transactions": 1})
+    client = Client(client_data["name"],
+                    client_data["cnp"],
+                    client_data["phone"],
+                    client_data["address"],
+                    client_data["balance"])
     if len(client_data["transactions"]) > 0:
         for transaction in client_data["transactions"]:
             client.transactions.append(

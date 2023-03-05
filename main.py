@@ -105,7 +105,7 @@ def change_balance(client_name, value):
 
 
 @app.route("/api/client", methods=["POST"])
-def register_client():
+def register_client():  # TODO have to implement logic for client already registered situation
     """
     Register a new client into the database.
     ---
@@ -119,9 +119,21 @@ def register_client():
         400:
             description: Dataset not valid.
     """
-    client_data = request.get_json()
-    print(client_data)
-    return {}, 200
+
+    try:
+        client_data = request.get_json()
+        create_client(client_data, clients_collection)
+    except KeyError as excep:
+        print(f'error type: {type(excep).__name__}')
+        return {'error message': 'probably user data incomplete'}, 400
+    except UserDataWrongType as excep:
+        print(f'error type: {type(excep).__name__}')
+        return {'error message': 'user data passed as wrong type'}, 400
+    except Exception as excep:
+        print(f'error type: {type(excep).__name__}')
+        return {'error message': type(excep).__name__}, 400
+    else:
+        return client_data, 200
 
 
 app.run(debug=True)
