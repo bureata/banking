@@ -26,10 +26,9 @@ class Client:
         self.balance = self.balance + amount
         self.transactions.append(Transaction("deposit", self.name, amount))
 
-    def transfer(self, receiver, amount):  # TODO raise exception if not enough funds
+    def transfer(self, receiver, amount):
         if self.balance < amount:
-            print("not enough funds")
-            return
+            raise NotEnoughFunds
         self.balance = self.balance - amount
         receiver.balance = receiver.balance + amount
         self.transactions.append(Transaction("transfer", self.name, amount, receiver.name))
@@ -72,6 +71,18 @@ def create_client(client_data: dict, clients_collection):
     for value in client_data.values():
         if type(value) != str:
             raise UserDataWrongType('Data supplied as client data is of wrong type.')
+    client_check = clients_collection.find_one({"cnp": client_data["cnp"]},
+                                               {"_id": 0,
+                                                "name": 1,
+                                                "cnp": 1})
+    if client_check is not None:
+        raise ClientAlreadyExists
+    phone_check = clients_collection.find_one({"phone": client_data["phone"]},
+                                              {"_id": 0,
+                                               "name": 1,
+                                               "cnp": 1})
+    if phone_check is not None:
+        raise PhoneAlreadyInUse
     new_client = Client(client_data["name"], client_data["cnp"], client_data["phone"], client_data["address"])
     clients_collection.insert_one(new_client.__dict__)
     return new_client
@@ -96,8 +107,8 @@ def delete_client_data():
     pass
 
 
-def client_obj_constructor(client_name, clients_collection):  # TODO take the client_id parameter instead of client_name
-    client_data = clients_collection.find_one({"name": client_name},
+def client_obj_constructor(cnp, clients_collection):
+    client_data = clients_collection.find_one({"cnp": cnp},
                                               {"_id": 0,
                                                "name": 1,
                                                "cnp": 1,
@@ -135,7 +146,7 @@ def balance_change(client, amount, clients_collection):  # TODO
     elif amount > 0:
         client.deposit(amount)
     else:
-        raise Exception("invalid amount")
+        raise AmountZero("invalid amount")
 
     transactions_list = []  # TODO make a separate function for this and use it in transfer function too
     for item in client.transactions:

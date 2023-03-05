@@ -68,20 +68,20 @@ def search_clients(name_filter):
         return jsonify(clients_data)
 
 
-@app.route("/api/client/<client_name>/<value>", methods=["PUT"])
-def change_balance(client_name, value):
+@app.route("/api/client/<client_cnp>/<amount>", methods=["PUT"])
+def change_balance(client_cnp, amount):
     """
     Modify the balance for a specific client.
     ---
     parameters:
-        - name: client_name
+        - name: client_cnp
           in: path
-          description: "client name"
+          description: "client unique identification number"
           type: string
           required: true
-        - name: value
+        - name: amount
           in: path
-          description: "value of the modification"
+          description: "value of the balance modification"
           type: string
           required: true
     responses:
@@ -92,14 +92,17 @@ def change_balance(client_name, value):
     """
 
     try:
-        balance_change(client_obj_constructor(client_name, clients_collection), float(value), clients_collection)
+        balance_change(client_obj_constructor(client_cnp, clients_collection), float(amount), clients_collection)
         return {"message": "Balance was successfully modified."}, 200
-    except TypeError:
-        print('Client does not exist.')
-        return {"error_message": "Client not found in the database."}, 404
     except NotEnoughFunds as excep:
         print(type(excep).__name__)
         return {"error_message": "Not enough funds."}, 400
+    except AmountZero as excep:
+        print(type(excep).__name__)
+        return {"error_message": "the amount cannot be 0"}, 400
+    except TypeError:
+        print('Error: Client does not exist.')
+        return {"error_message": "Client not found in the database."}, 404
     except ValueError as excep:
         print(str(excep))
         return {"error_message": "Value must be a number."}, 400
@@ -109,7 +112,7 @@ def change_balance(client_name, value):
 
 
 @app.route("/api/client", methods=["POST"])
-def register_client():  # TODO have to implement logic for client already registered situation
+def register_client():
     """
     Register a new client into the database.
     ---
@@ -127,6 +130,12 @@ def register_client():  # TODO have to implement logic for client already regist
     try:
         client_data = request.get_json()
         create_client(client_data, clients_collection)
+    except ClientAlreadyExists as excep:
+        print(f'error type: {type(excep).__name__}')
+        return {'error message': 'client already has an account'}, 400
+    except PhoneAlreadyInUse as excep:
+        print(f'error type: {type(excep).__name__}')
+        return {'error message': 'phone number already in use'}, 400
     except KeyError as excep:
         print(f'error type: {type(excep).__name__}')
         return {'error message': 'probably user data incomplete'}, 400
@@ -141,3 +150,5 @@ def register_client():  # TODO have to implement logic for client already regist
 
 
 app.run(debug=True)
+
+# db_client.close()  # TODO implement logic for db connection close

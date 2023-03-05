@@ -12,3 +12,15 @@ class UserDataWrongType(ValueError):
 
 class NotEnoughFunds(ValueError):
     pass
+
+
+class ClientAlreadyExists(ValueError):
+    pass
+
+
+class PhoneAlreadyInUse(ValueError):
+    pass
+
+
+class AmountZero(ValueError):
+    pass
