@@ -61,9 +61,9 @@ def search_clients(name_filter):
 
     try:
         clients_data = retrieve_clients(name_filter, clients_collection)
-    except NoClientsForFilter as e:
-        print(f'Exception: {e}')
-        return {"error_message": str(e)}, 404
+    except BankException as excep:
+        print(f'error {type(excep).__name__}: {excep.message["error_message"]}')
+        return excep.message, excep.error_code
     else:
         return jsonify(clients_data)
 
@@ -92,23 +92,15 @@ def change_balance(client_cnp, amount):
     """
 
     try:
+        try:
+            amount = float(amount)
+        except Exception:
+            raise AmountNotNumber
         balance_change(client_obj_constructor(client_cnp, clients_collection), float(amount), clients_collection)
         return {"message": "Balance was successfully modified."}, 200
-    except NotEnoughFunds as excep:
-        print(type(excep).__name__)
-        return {"error_message": "Not enough funds."}, 400
-    except AmountZero as excep:
-        print(type(excep).__name__)
-        return {"error_message": "the amount cannot be 0"}, 400
-    except TypeError:
-        print('Error: Client does not exist.')
-        return {"error_message": "Client not found in the database."}, 404
-    except ValueError as excep:
-        print(str(excep))
-        return {"error_message": "Value must be a number."}, 400
-    except Exception as excep:
-        print(excep)
-        return {"error_message": type(excep).__name__}, 404
+    except BankException as excep:
+        print(f'error {type(excep).__name__}: {excep.message["error_message"]}')
+        return excep.message, excep.error_code
 
 
 @app.route("/api/client", methods=["POST"])
@@ -129,22 +121,12 @@ def register_client():
 
     try:
         client_data = request.get_json()
+        if len(client_data.keys()) < 4:
+            raise UserDataMissingArgument
         create_client(client_data, clients_collection)
-    except ClientAlreadyExists as excep:
-        print(f'error type: {type(excep).__name__}')
-        return {'error message': 'client already has an account'}, 400
-    except PhoneAlreadyInUse as excep:
-        print(f'error type: {type(excep).__name__}')
-        return {'error message': 'phone number already in use'}, 400
-    except KeyError as excep:
-        print(f'error type: {type(excep).__name__}')
-        return {'error message': 'probably user data incomplete'}, 400
-    except UserDataWrongType as excep:
-        print(f'error type: {type(excep).__name__}')
-        return {'error message': 'user data passed as wrong type'}, 400
-    except Exception as excep:
-        print(f'error type: {type(excep).__name__}')
-        return {'error message': type(excep).__name__}, 400
+    except BankException as excep:
+        print(f'error {type(excep).__name__}: {excep.message["error_message"]}')
+        return excep.message, excep.error_code
     else:
         return client_data, 200
 

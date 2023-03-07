@@ -116,6 +116,8 @@ def client_obj_constructor(cnp, clients_collection):
                                                "address": 1,
                                                "balance": 1,
                                                "transactions": 1})
+    if client_data is None:
+        raise ClientNotFound
     client = Client(client_data["name"],
                     client_data["cnp"],
                     client_data["phone"],
