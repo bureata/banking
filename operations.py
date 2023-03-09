@@ -157,44 +157,34 @@ def balance_change(client, amount, clients_collection):  # TODO
                                   {"$set": {"balance": client.balance, "transactions": transactions_list}})
 
 
-def transfer(amount, sender_name, receiver_name, clients_collection):  # TODO
+def money_transfer(sender, receiver, amount, clients_collection):  # TODO
     # TODO use parameter sender_id instead of sender_name
     #   create and raise exception for not enough funds
     #   create and raise exception for amount < 0
     """
     Make a transaction between two clients as long as the sender has enough funds.
     :param amount: float Amount to be transferred.
-    :param sender_name: str Unique identifier for the sender.
-    :param receiver_name: str Unique identifier for the receiver.
+    :param sender: str Sender object.
+    :param receiver: str Receiver object.
     :param clients_collection: mongoDB_object Connection object to a specific collection on a mongoDB database.
     """
     if amount <= 0:
-        print('The amount to be transferred must be positive.')
-    else:
-        sender = client_obj_constructor(sender_name, clients_collection)
-        receiver = client_obj_constructor(receiver_name, clients_collection)
-        if sender.balance >= amount:  # TODO raise exception and ditch the if-else
-            print(f"{sender.name}'s initial balance: {sender.balance}")
-            print(f"{receiver.name}'s initial balance: {receiver.balance}")
-            sender.transfer(receiver, amount)
-            print(f"{sender.name}'s final balance: {sender.balance}")
-            print(f"{receiver.name}'s final balance: {receiver.balance}")
+        raise AmountNotPositive
+    print(f"{sender.name}'s initial balance: {sender.balance}")
+    print(f"{receiver.name}'s initial balance: {receiver.balance}")
+    sender.transfer(receiver, amount)
+    print(f"{sender.name}'s final balance: {sender.balance}")
+    print(f"{receiver.name}'s final balance: {receiver.balance}")
+    rewrite_transfers(sender, clients_collection)
+    rewrite_transfers(receiver, clients_collection)
 
-            sender_transactions = []  # TODO use function
-            for item in sender.transactions:
-                sender_transactions.append(item.__dict__)
-            clients_collection.update_one({"name": sender.name},
-                                          {"$set": {"balance": sender.balance, "transactions": sender_transactions}})
 
-            print(receiver.transactions)
-
-            receiver_transactions = []  # TODO use function
-            for item in receiver.transactions:
-                receiver_transactions.append(item.__dict__)
-            clients_collection.update_one({"name": receiver.name}, {
-                "$set": {"balance": receiver.balance, "transactions": receiver_transactions}})
-        else:
-            print('Expeditorul nu are fonduri suficiente. Transferul nu a fost efectuat.')
+def rewrite_transfers(client, clients_collection):
+    client_transactions = []
+    for item in client.transactions:
+        client_transactions.append(item.__dict__)
+    clients_collection.update_one({"name": client.name},
+                                  {"$set": {"balance": client.balance, "transactions": client_transactions}})
 
 
 def retrieve_clients(name_filter, clients_collection):

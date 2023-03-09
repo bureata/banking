@@ -2,6 +2,7 @@ class BankException(Exception):
     message = 'blank'
     error_code = 0
 
+
 class NoClientsForFilter(BankException):
     message = {"error_message": "no clients for filter"}
     error_code = 404
@@ -45,3 +46,8 @@ class AmountNotNumber(BankException):
 class ClientNotFound(BankException):
     message = {"error_message": "client not found in the database"}
     error_code = 404
+
+
+class AmountNotPositive(BankException):
+    message = {"error_message": "the amount for transfer must be positive"}
+    error_code = 400

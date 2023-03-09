@@ -15,15 +15,15 @@ db = db_client["bankingDB"]
 clients_collection = db["clients"]
 
 
-@app.route("/api/client/<client_name>", methods=["GET"])
-def check_balance(client_name):
+@app.route("/api/client/<client_cnp>", methods=["GET"])
+def check_balance(client_cnp):
     """
     Returns the balance of a client
     ---
     parameters:
-        - name: client_name
+        - name: client_cnp
           in: path
-          description: "name of the client"
+          description: "cnp of the client"
           type: string
           required: true
     responses:
@@ -33,9 +33,9 @@ def check_balance(client_name):
             description: User not found.
     """
     try:
-        balanta = clients_collection.find_one({"nume": client_name}, {"_id": 0, "balanta": 1})["balanta"]
-        print(balanta)
-        return jsonify(balanta)
+        balance = clients_collection.find_one({"cnp": client_cnp}, {"_id": 0, "balance": 1})["balance"]
+        print(balance)
+        return jsonify(balance)
     except TypeError:
         print('Client inexistent.')
         return {"error_message": "clientul nu a fost gasit in baza de date"}, 404
@@ -129,6 +129,34 @@ def register_client():
         return excep.message, excep.error_code
     else:
         return client_data, 200
+
+
+@app.route("/api/client/transfer", methods=["PUT"])
+def transfer():
+    """
+    Transfer money.
+    ---
+    parameters:
+        - name: transfer_data
+          in: body
+    responses:
+        200:
+            description: An user object.
+        404:
+            description: User not found.
+    """
+
+    try:
+        transfer_data = request.get_json()
+        sender = client_obj_constructor(transfer_data["sender_cnp"], clients_collection)
+        receiver = client_obj_constructor(transfer_data["receiver_cnp"], clients_collection)
+        money_transfer(sender, receiver, transfer_data["amount"], clients_collection)
+
+    except BankException as excep:
+        print(f'error {type(excep).__name__}: {excep.message["error_message"]}')
+        return excep.message, excep.error_code
+    else:
+        return {"message": "transfer succeeded"}, 200
 
 
 app.run(debug=True)
