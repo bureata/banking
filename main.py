@@ -159,6 +159,32 @@ def transfer():
         return {"message": "transfer succeeded"}, 200
 
 
+@app.route("/api/client/statement/<client_cnp>", methods=["GET"])
+def statement(client_cnp):
+    """
+    Returns the statement of a client.
+    ---
+    parameters:
+        - name: client_cnp
+          in: path
+          description: "cnp of the client"
+          type: string
+          required: true
+    responses:
+        200:
+            description: "a statement"
+        404:
+            description: User not found.
+    """
+    try:
+        client_statement = clients_collection.find_one({"cnp": client_cnp},
+                                                       {"_id": 0, "transactions": 1})["transactions"]
+        return jsonify(client_statement)
+    except TypeError:
+        print('Client not found.')
+        return {"error_message": "client not found"}, 404
+
+
 app.run(debug=True)
 
 # db_client.close()  # TODO implement logic for db connection close
