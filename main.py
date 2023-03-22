@@ -1,5 +1,7 @@
 # TODO implement two languages for the front end part
 
+# TODO implement api documentation
+
 from flask import Flask, jsonify, request
 from flasgger import Swagger
 import pymongo
@@ -159,6 +161,7 @@ def register_client():
 
 @app.route("/api/client/delete/<client_cnp>", methods=["PUT"])
 def delete_client(client_cnp):
+    # TODO implement logic to prevent closing an account that has money left or debt
     """
     Mark a client as deleted and assign a deletion timestamp
         (it will be actually deleted after a certain period has passed).

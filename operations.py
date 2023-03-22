@@ -88,19 +88,6 @@ def create_client(client_data: dict, clients_collection):
     return new_client
 
 
-def delete_client(nume_client, clients_collection):  # TODO
-    # TODO implement logic to prevent closing an account that has money left or debt
-    print(nume_client)
-    clients_collection.update_one({"name": nume_client}, {"deleted": True})
-    # sold = verifica_sold(nume_client, dict_clients)
-    # if sold < 0:
-    #     print(f'Pentru inchiderea contului este necesara achitarea sumei restante de: {sold}.')
-    # elif sold > 0:
-    #     print(f'Contul figureaza cu o sold de {sold}, care va fi restituita clientului.')
-    # else:
-    #     print(f'Soldul este 0. Contul va fi sters, impreuna cu informatiile despre client.')
-
-
 def delete_client_data():
     # TODO implement a function that will be automatically triggered
     #   and will delete data for an account that was deleted x days ago
