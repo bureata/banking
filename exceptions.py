@@ -49,5 +49,5 @@ class ClientNotFound(BankException):
 
 
 class AmountNotPositive(BankException):
-    message = {"error_message": "the amount for transfer must be positive"}
+    message = {"error_message": "the amount for transaction must be positive"}
     error_code = 400

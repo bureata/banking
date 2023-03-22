@@ -73,36 +73,57 @@ def search_clients(name_filter):
         return jsonify(clients_data)
 
 
-@app.route("/api/client/<client_cnp>/<amount>", methods=["PUT"])
-def change_balance(client_cnp, amount):
+@app.route("/api/client/deposit", methods=["POST"])
+def deposit():
     """
-    Modify the balance by a specific amount (positive or negative) for a specific client.
+    Register a deposit for a client.
     ---
     parameters:
-        - name: client_cnp
-          in: path
-          description: "client unique identification number"
-          type: string
-          required: true
-        - name: amount
-          in: path
-          description: "value of the balance modification"
-          type: string
-          required: true
+        - name: transaction_data
+          in: body
+
     responses:
         200:
-            description: An user object.
-        404:"
-            description: User not found.
+            description: Deposit registered.
+        400:
+            description: Dataset not valid.
     """
-
+    transaction_data = request.get_json()
     try:
-        try:
-            amount = float(amount)
-        except Exception:
-            raise AmountNotNumber
-        balance_change(client_obj_constructor(client_cnp, clients_collection), float(amount), clients_collection)
-        return {"message": "Balance was successfully modified."}, 200
+        if transaction_data["amount"] <= 0:
+            raise AmountNotPositive
+        client = client_obj_constructor(transaction_data["client_cnp"], clients_collection)
+        client.deposit(transaction_data["amount"])
+        db_register_balance_transactions(client, clients_collection)
+        return {"message": "Deposit successfully ."}, 200
+    except BankException as excep:
+        print(f'error {type(excep).__name__}: {excep.message["error_message"]}')
+        return excep.message, excep.error_code
+
+
+@app.route("/api/client/withdrawal", methods=["POST"])
+def withdrawal():
+    """
+    Register a withdrawal for a client.
+    ---
+    parameters:
+        - name: transaction_data
+          in: body
+
+    responses:
+        200:
+            description: Withdrawal registered.
+        400:
+            description: Dataset not valid.
+    """
+    transaction_data = request.get_json()
+    try:
+        if transaction_data["amount"] <= 0:
+            raise AmountNotPositive
+        client = client_obj_constructor(transaction_data["client_cnp"], clients_collection)
+        client.withdrawal(transaction_data["amount"])
+        db_register_balance_transactions(client, clients_collection)
+        return {"message": "Deposit successfully ."}, 200
     except BankException as excep:
         print(f'error {type(excep).__name__}: {excep.message["error_message"]}')
         return excep.message, excep.error_code

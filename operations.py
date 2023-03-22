@@ -15,10 +15,10 @@ class Client:
 
     def withdrawal(self, amount):
 
-        if self.balance < -amount:
+        if self.balance < amount:
             raise NotEnoughFunds
 
-        self.balance += amount
+        self.balance -= amount
         self.transactions.append(Transaction("withdrawal", self.name, amount))
 
     def deposit(self, amount):
@@ -136,29 +136,6 @@ def client_obj_constructor(cnp, clients_collection):
     return client
 
 
-def balance_change(client, amount, clients_collection):  # TODO
-    # TODO take client_id as parameter instead of client_name
-    #   refactor the exception for invalid amount
-    """
-    This function modifies the balance of a client.
-    :param clients_collection: mongoDB_object Connection object to a specific collection on a mongoDB database.
-    :param client: Client Object of the client.
-    :param amount: float The amount for the modification.
-    """
-    if amount < 0:
-        client.withdrawal(amount)
-    elif amount > 0:
-        client.deposit(amount)
-    else:
-        raise AmountZero("invalid amount")
-
-    transactions_list = []  # TODO make a separate function for this and use it in transfer function too
-    for item in client.transactions:
-        transactions_list.append(item.__dict__)
-    clients_collection.update_one({"cnp": client.cnp},
-                                  {"$set": {"balance": client.balance, "transactions": transactions_list}})
-
-
 def money_transfer(sender, receiver, amount, clients_collection):  # TODO
     # TODO use parameter sender_id instead of sender_name
     #   create and raise exception for not enough funds
@@ -177,11 +154,11 @@ def money_transfer(sender, receiver, amount, clients_collection):  # TODO
     sender.transfer(receiver, amount)
     print(f"{sender.name}'s final balance: {sender.balance}")
     print(f"{receiver.name}'s final balance: {receiver.balance}")
-    rewrite_transfers(sender, clients_collection)
-    rewrite_transfers(receiver, clients_collection)
+    db_register_balance_transactions(sender, clients_collection)
+    db_register_balance_transactions(receiver, clients_collection)
 
 
-def rewrite_transfers(client, clients_collection):
+def db_register_balance_transactions(client, clients_collection):
     client_transactions = []
     for item in client.transactions:
         client_transactions.append(item.__dict__)
