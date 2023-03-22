@@ -4,7 +4,7 @@ from exceptions import *
 
 class Client:
 
-    def __init__(self, name, cnp, phone, address, balance=0.0, deleted=False):
+    def __init__(self, name, cnp, phone, address, balance=0.0, deleted=None):
         self.name = name
         self.cnp = cnp
         self.phone = phone
@@ -153,7 +153,7 @@ def balance_change(client, amount, clients_collection):  # TODO
     transactions_list = []  # TODO make a separate function for this and use it in transfer function too
     for item in client.transactions:
         transactions_list.append(item.__dict__)
-    clients_collection.update_one({"name": client.name},
+    clients_collection.update_one({"cnp": client.cnp},
                                   {"$set": {"balance": client.balance, "transactions": transactions_list}})
 
 

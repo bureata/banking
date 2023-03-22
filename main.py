@@ -131,6 +131,30 @@ def register_client():
         return client_data, 200
 
 
+@app.route("/api/client/delete/<client_cnp>", methods=["PUT"])
+def delete_client(client_cnp):
+    """
+    Mark a client as deleted and assign a deletion timestamp
+        (it will be actually deleted after a certain period has passed).
+    ---
+    parameters:
+        - name: client_cnp
+          in: path
+
+    responses:
+        200:
+            description: client deleted.
+        400:
+            description: Client not found.
+    """
+    try:
+        clients_collection.update_one({"cnp": client_cnp},
+                                      {"$set": {"deleted": transaction_timestamp()}})
+        return {"message": "Client deleted."}, 200
+    except BankException as excep:
+        print(f'error {type(excep).__name__}: {excep.message["error_message"]}')
+        return excep.message, excep.error_code
+
 @app.route("/api/client/transfer", methods=["PUT"])
 def transfer():
     """
