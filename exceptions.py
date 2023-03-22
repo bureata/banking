@@ -51,3 +51,8 @@ class ClientNotFound(BankException):
 class AmountNotPositive(BankException):
     message = {"error_message": "the amount for transaction must be positive"}
     error_code = 400
+
+
+class DateFormatWrong(BankException):
+    message = {"error_message": "date passed in wrong format"}
+    error_code = 400
