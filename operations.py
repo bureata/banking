@@ -108,7 +108,9 @@ def delete_client_data():
 
 
 def client_obj_constructor(cnp, clients_collection):
-    client_data = clients_collection.find_one({"cnp": cnp},
+    client_data = clients_collection.find_one({"cnp": cnp,
+                                               "deleted": {"$eq": None}
+                                               },
                                               {"_id": 0,
                                                "name": 1,
                                                "cnp": 1,
@@ -188,7 +190,10 @@ def rewrite_transfers(client, clients_collection):
 
 
 def retrieve_clients(name_filter, clients_collection):
-    clients_names = clients_collection.find({'name': {'$regex': name_filter, '$options': 'i'}},
+
+    clients_names = clients_collection.find({'name': {'$regex': name_filter, '$options': 'i'},
+                                             "deleted": {"$eq": None}
+                                             },
                                             {"_id": 0, "name": 1, "cnp": 1})
     clients_list = []
     for name in clients_names:

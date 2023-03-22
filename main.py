@@ -33,12 +33,17 @@ def check_balance(client_cnp):
             description: User not found.
     """
     try:
-        balance = clients_collection.find_one({"cnp": client_cnp}, {"_id": 0, "balance": 1})["balance"]
+        client_data = clients_collection.find_one({"cnp": client_cnp, "deleted": {"$eq": None}},
+                                                  {"_id": 0, "balance": 1})
+        try:
+            balance = client_data["balance"]
+        except Exception:
+            raise ClientNotFound
         print(balance)
         return jsonify(balance)
-    except TypeError:
-        print('Client inexistent.')
-        return {"error_message": "clientul nu a fost gasit in baza de date"}, 404
+    except BankException as excep:
+        print(f'error {type(excep).__name__}: {excep.message["error_message"]}')
+        return excep.message, excep.error_code
 
 
 @app.route("/api/client/filtru/<name_filter>", methods=["GET"])
@@ -71,7 +76,7 @@ def search_clients(name_filter):
 @app.route("/api/client/<client_cnp>/<amount>", methods=["PUT"])
 def change_balance(client_cnp, amount):
     """
-    Modify the balance for a specific client.
+    Modify the balance by a specific amount (positive or negative) for a specific client.
     ---
     parameters:
         - name: client_cnp
@@ -87,7 +92,7 @@ def change_balance(client_cnp, amount):
     responses:
         200:
             description: An user object.
-        404:
+        404:"
             description: User not found.
     """
 
@@ -155,6 +160,7 @@ def delete_client(client_cnp):
         print(f'error {type(excep).__name__}: {excep.message["error_message"]}')
         return excep.message, excep.error_code
 
+
 @app.route("/api/client/transfer", methods=["PUT"])
 def transfer():
     """
@@ -201,7 +207,7 @@ def statement(client_cnp):
             description: User not found.
     """
     try:
-        client_statement = clients_collection.find_one({"cnp": client_cnp},
+        client_statement = clients_collection.find_one({"cnp": client_cnp, "deleted": {"$eq": None}},
                                                        {"_id": 0, "transactions": 1})["transactions"]
         return jsonify(client_statement)
     except TypeError:
