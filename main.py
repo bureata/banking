@@ -128,7 +128,7 @@ def withdrawal():
         client = client_obj_constructor(transaction_data["client_cnp"], clients_collection)
         client.withdrawal(transaction_data["amount"])
         db_register_balance_transactions(client, clients_collection)
-        return {"message": "Deposit successfully ."}, 200
+        return {"message": "Withdrawal successfully ."}, 200
     except BankException as excep:
         print(f'error {type(excep).__name__}: {excep.message["error_message"]}')
         return excep.message, excep.error_code

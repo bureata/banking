@@ -24,12 +24,12 @@ class NotEnoughFunds(BankException):
 
 
 class ClientAlreadyExists(BankException):
-    message = {'error message': 'client already has an account'}
+    message = {'error_message': 'client already has an account'}
     error_code = 400
 
 
 class PhoneAlreadyInUse(BankException):
-    message = {'error message': 'phone number already in use'}
+    message = {'error_message': 'phone number already in use'}
     error_code = 400
 
 
