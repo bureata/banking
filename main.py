@@ -1,6 +1,3 @@
-# TODO implement two languages for the front end part
-
-# TODO implement api documentation
 
 from flask import Flask, jsonify, request
 from flasgger import Swagger
@@ -81,8 +78,11 @@ def deposit():
     Register a deposit for a client.
     ---
     parameters:
-        - name: transaction_data
-          in: body
+      - in: body
+        name: body
+        required: true
+        description: Data needed for a deposit.
+        example: {"client_cnp": "1870325874038", "amount": 29.1}
 
     responses:
         200:
@@ -109,8 +109,11 @@ def withdrawal():
     Register a withdrawal for a client.
     ---
     parameters:
-        - name: transaction_data
-          in: body
+      - in: body
+        name: body
+        required: true
+        description: Data needed for a withdrawal.
+        example: {"client_cnp": "1870325874038", "amount": 1.1}
 
     responses:
         200:
@@ -137,8 +140,11 @@ def register_client():
     Register a new client into the database.
     ---
     parameters:
-        - name: client_data
-          in: body
+      - in: body
+        name: body
+        required: true
+        description: Data needed for a new client registration.
+        example: {"name": "Fărâmiță Lambru", "cnp": "1270915876309", "phone": "0727644098", "address": "București"}
 
     responses:
         200:
@@ -191,8 +197,11 @@ def transfer():
     Transfer money.
     ---
     parameters:
-        - name: transfer_data
-          in: body
+      - in: body
+        name: body
+        required: true
+        description: Data needed for a transfer between two clients.
+        example: {"sender_cnp": "1760815864890", "receiver_cnp": "2981127387508", "amount": 23}
     responses:
         200:
             description: An user object.
